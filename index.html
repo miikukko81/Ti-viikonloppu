@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Twilight Imperium -viikonloppu</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script>
+/* ====== ASETUKSET: liitä tähän Supabase-projektisi tiedot ======
+   Supabase → Project Settings → API (tai "Connect"-nappi)        */
+window.SUPABASE_URL = "https://rnxpfdzpltpuurosjnwk.supabase.co";
+window.SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJueHBmZHpwbHRwdXVyb3NqbndrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI4NDM1NjgsImV4cCI6MjEwODQxOTU2OH0.GMnSIMcpJiVRbjydJ5dMfTncNgmj6Qp76e8nYEerrp4";
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<style>
+:root{
+  --bg:#0b0f1c; --surface:#121a2d; --surface2:#18223a; --fg:#e7e9f0; --muted:#8e97b0; --line:#253150;
+  --gold:#d9b25f; --gold-soft:#2c2617;
+  --yes:#6fd3a0; --yes-soft:#163227; --maybe:#e8b75a; --maybe-soft:#33291a; --no:#f08a7e; --no-soft:#3a1f22;
+  --display:"Michroma","Eurostile","Segoe UI",sans-serif;
+  --body:"Barlow","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.45;
+  background-image:radial-gradient(1px 1px at 12% 18%,rgba(231,233,240,.5),transparent 60%),radial-gradient(1px 1px at 78% 9%,rgba(231,233,240,.4),transparent 60%),radial-gradient(1.5px 1.5px at 62% 34%,rgba(217,178,95,.5),transparent 60%),radial-gradient(1px 1px at 30% 62%,rgba(231,233,240,.35),transparent 60%),radial-gradient(1px 1px at 88% 72%,rgba(231,233,240,.4),transparent 60%),radial-gradient(900px 500px at 50% -10%,#1a2546,transparent 70%);
+  background-attachment:fixed}
+[hidden]{display:none!important}
+.wrap{max-width:700px;margin:0 auto;padding-block:32px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{display:grid;gap:8px;margin-bottom:22px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(22px,6.2vw,36px);line-height:1.2;margin:0;letter-spacing:.04em;text-transform:uppercase;text-wrap:balance}
+.lede{margin:2px 0 0;color:var(--muted);max-width:62ch}
+.facts{display:flex;flex-wrap:wrap;gap:6px 16px;font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:4px}
+.facts b{color:var(--fg);font-weight:500}
+.roll{margin:22px 0 8px;padding:16px;border:1px solid var(--line);border-radius:10px;background:var(--surface);display:grid;gap:10px}
+.roll label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.roll .line{display:flex;gap:8px;flex-wrap:wrap}
+.roll input{flex:1 1 200px;min-width:0;font:inherit;font-size:16px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg);color:var(--fg)}
+.roll input:focus-visible{outline:2px solid var(--gold);outline-offset:1px;border-color:var(--gold)}
+.roll button{font:inherit;font-weight:600;padding:10px 16px;border-radius:8px;border:1.5px solid var(--gold);background:var(--gold);color:#1a1405;cursor:pointer}
+.roll button:disabled{opacity:.5;cursor:default}
+.hint{font-size:13px;color:var(--muted)} .hint.ok{color:var(--yes)} .hint.err{color:var(--no)}
+.status{font-size:13px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.status b{color:var(--fg);font-weight:600}
+.best{margin:16px 0 4px;padding:14px 16px;border-radius:10px;border:1px solid var(--gold);background:var(--gold-soft);display:flex;gap:4px 12px;align-items:baseline;flex-wrap:wrap}
+.best .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.best .val{font-weight:600}
+.month{margin-top:30px}
+.month h2{font-family:var(--display);font-weight:400;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0 0 6px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.list{display:grid}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 14px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}
+.date{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.date strong{font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.wk{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:4px;background:var(--gold);color:#1a1405}
+.tally{display:flex;gap:12px;font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:3px;font-variant-numeric:tabular-nums}
+.tally .y{color:var(--yes)} .tally .m{color:var(--maybe)} .tally .n{color:var(--no)}
+.bar{height:4px;border-radius:2px;background:var(--line);overflow:hidden;display:flex;margin-top:7px;max-width:240px}
+.bar i{display:block;height:100%} .bar .y{background:var(--yes)} .bar .m{background:var(--maybe)}
+.who{grid-column:1/-1;font-size:14px;color:var(--muted);min-width:0;overflow-wrap:anywhere}
+.who:empty{display:none}
+.who .y{color:var(--yes)} .who .m{color:var(--maybe)} .who .n{color:var(--no)}
+.votes{display:flex;gap:6px}
+.vb{font:inherit;font-size:14px;font-weight:600;border:1.5px solid var(--line);background:var(--surface2);color:var(--fg);padding:7px 12px;border-radius:999px;cursor:pointer;min-width:60px;transition:background .12s,border-color .12s}
+.vb:hover:not(:disabled){border-color:var(--muted)}
+.vb:focus-visible,.roll button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.vb[data-c="yes"][aria-pressed="true"]{background:var(--yes-soft);border-color:var(--yes);color:var(--yes)}
+.vb[data-c="maybe"][aria-pressed="true"]{background:var(--maybe-soft);border-color:var(--maybe);color:var(--maybe)}
+.vb[data-c="no"][aria-pressed="true"]{background:var(--no-soft);border-color:var(--no);color:var(--no)}
+.vb:disabled{opacity:.45;cursor:default}
+@media (max-width:480px){.row{grid-template-columns:1fr}.vb{flex:1}}
+@media (prefers-reduced-motion:reduce){.vb{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Galaktinen neuvosto kokoontuu</div>
+    <h1>Twilight Imperium -viikonloppu</h1>
+    <p class="lede">Milloin ehdit valtaistuinkamppailuun? Viikonloppu varataan torstaista sunnuntaihin. Kirjoita nimesi ja merkitse jokaiselle viikonlopulle, käykö se. Napauta valintaa uudelleen poistaaksesi sen.</p>
+    <div class="facts"><span>Peli <b>3–8</b> pelaajaa</span><span>Varaus <b>to–su</b></span><span>Voittoon <b>10 VP</b></span><span>Ajalla <b>29.10.2026 – 25.4.2027</b></span></div>
+  </header>
+
+  <form class="roll" id="roll">
+    <label for="name">Nimesi</label>
+    <div class="line">
+      <input id="name" type="text" maxlength="40" autocomplete="nickname" placeholder="esim. Miika" required>
+      <button id="saveName" type="submit">Tallenna nimi</button>
+    </div>
+    <div class="hint" id="nameHint">Nimi näkyy muille äänesi vieressä. Äänesi muistetaan tällä laitteella.</div>
+  </form>
+
+  <div class="status" id="status">Yhdistetään…</div>
+  <div id="best" class="best" hidden></div>
+  <div id="months"></div>
+</div>
+
+<script>
+(function(){
+  const MONTHS=["tammikuu","helmikuu","maaliskuu","huhtikuu","toukokuu","kesäkuu","heinäkuu","elokuu","syyskuu","lokakuu","marraskuu","joulukuu"];
+  const LABELS={yes:"Käy",maybe:"Ehkä",no:"Ei"};
+  const pad=n=>String(n).padStart(2,"0");
+  const key=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+  function isoWeek(d){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-day);const y=new Date(Date.UTC(t.getUTCFullYear(),0,1));return Math.ceil(((t-y)/864e5+1)/7);}
+  const weekends=[];
+  // Peliviikonloppu = torstai–lauantai (3 päivää). sat = alkupäivä (to), sun = loppupäivä (la)
+  for(let d=new Date(2026,9,29);d<=new Date(2027,3,22);d=new Date(d.getFullYear(),d.getMonth(),d.getDate()+7))
+    weekends.push({k:key(d),sat:d,sun:new Date(d.getFullYear(),d.getMonth(),d.getDate()+3),wk:isoWeek(d)});
+  const fmt=w=>"To "+w.sat.getDate()+"."+(w.sat.getMonth()+1)+". – Su "+w.sun.getDate()+"."+(w.sun.getMonth()+1)+".";
+
+  const $=id=>document.getElementById(id);
+  const statusEl=$("status"), nameEl=$("name"), hint=$("nameHint");
+  function setHint(t,c){hint.textContent=t;hint.className="hint"+(c?" "+c:"");}
+
+  // Äänestäjän tunniste tallessa tällä laitteella
+  let me=null;
+  try{me=localStorage.getItem("ti-voter");if(!me){me=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2));localStorage.setItem("ti-voter",me);}}catch(e){me="tmp-"+Date.now()+Math.random().toString(16).slice(2);}
+
+  let myName="", mine={}, all={}, ready=false, sb=null;
+
+  function nm(u){return u===me?(myName||"sinä")+" (sinä)":(all[u]&&all[u].n)||"Nimetön";}
+  function tallies(k){const t={yes:[],maybe:[],no:[]};for(const [u,d] of Object.entries(all)){const c=d.v&&d.v[k];if(t[c])t[c].push(u);}return t;}
+
+  function render(){
+    const voters=Object.keys(all).filter(u=>all[u].v&&Object.keys(all[u].v).length);
+    let best=null;
+    for(const w of weekends){const t=tallies(w.k);const s=t.yes.length*2+t.maybe.length-t.no.length*2;if(t.yes.length&&(!best||s>best.s))best={w,s,t};}
+    const bestEl=$("best");
+    if(best){bestEl.hidden=false;bestEl.innerHTML="";const a=document.createElement("span");a.className="lbl";a.textContent="Paras ehdokas";const b=document.createElement("span");b.className="val";b.textContent=fmt(best.w)+" · "+best.t.yes.length+" käy, "+best.t.maybe.length+" ehkä, "+best.t.no.length+" ei";bestEl.append(a,b);}else bestEl.hidden=true;
+    const canVote=ready&&!!myName;
+    const root=$("months");root.innerHTML="";let cur=null,list=null;
+    for(const w of weekends){
+      const m=w.sat.getMonth()+"-"+w.sat.getFullYear();
+      if(m!==cur){cur=m;const sec=document.createElement("section");sec.className="month";const h=document.createElement("h2");h.textContent=MONTHS[w.sat.getMonth()]+" "+w.sat.getFullYear();list=document.createElement("div");list.className="list";sec.append(h,list);root.append(sec);}
+      const t=tallies(w.k),total=t.yes.length+t.maybe.length+t.no.length;
+      const row=document.createElement("div");row.className="row";
+      const left=document.createElement("div");left.style.minWidth="0";
+      const date=document.createElement("div");date.className="date";
+      const s=document.createElement("strong");s.textContent=fmt(w);
+      const wk=document.createElement("span");wk.className="wk";wk.textContent="vko "+w.wk;
+      date.append(s,wk);
+      if(best&&best.w===w){const tg=document.createElement("span");tg.className="tag";tg.textContent="Suosituin";date.append(tg);}
+      const tal=document.createElement("div");tal.className="tally";
+      tal.innerHTML='<span class="y">✓ '+t.yes.length+'</span><span class="m">? '+t.maybe.length+'</span><span class="n">✕ '+t.no.length+'</span>';
+      const bar=document.createElement("div");bar.className="bar";
+      if(total)bar.innerHTML='<i class="y" style="width:'+(t.yes.length/total*100)+'%"></i><i class="m" style="width:'+(t.maybe.length/total*100)+'%"></i>';
+      left.append(date,tal,bar);
+      const btns=document.createElement("div");btns.className="votes";btns.setAttribute("role","group");btns.setAttribute("aria-label","Äänesi: "+fmt(w));
+      for(const c of ["yes","maybe","no"]){
+        const b=document.createElement("button");b.type="button";b.className="vb";b.dataset.c=c;
+        b.textContent=LABELS[c];b.setAttribute("aria-pressed",mine[w.k]===c?"true":"false");
+        b.disabled=!canVote;if(!canVote&&ready)b.title="Kirjoita ensin nimesi";
+        b.addEventListener("click",()=>vote(w.k,c));btns.append(b);
+      }
+      const who=document.createElement("div");who.className="who";
+      for(const [c,cls,lbl] of [["yes","y","Käy"],["maybe","m","Ehkä"],["no","n","Ei"]]){
+        if(!t[c].length)continue;if(who.childNodes.length)who.append(" · ");
+        const sp=document.createElement("span");sp.className=cls;sp.textContent=lbl+": ";who.append(sp,t[c].map(nm).join(", "));
+      }
+      row.append(left,btns,who);list.append(row);
+    }
+    if(!ready)return;
+    statusEl.innerHTML="";
+    const n=document.createElement("b");n.textContent=voters.length+(voters.length===1?" vastaaja":" vastaajaa");statusEl.append(n);
+    if(!myName){const x=document.createElement("span");x.textContent="· Kirjoita nimesi yllä, niin pääset äänestämään.";statusEl.append(x);}
+  }
+
+  async function load(){
+    const {data,error}=await sb.from("ti_votes").select("voter,name,choices");
+    if(error){statusEl.textContent="Äänien haku epäonnistui: "+error.message;return false;}
+    const next={};for(const r of data){next[r.voter]={n:(r.name||"").slice(0,40),v:(r.choices&&typeof r.choices==="object")?r.choices:{}};}
+    if(saving)next[me]={n:myName,v:Object.assign({},mine)};
+    all=next;
+    if(all[me]&&!saving){mine=Object.assign({},all[me].v);if(all[me].n){myName=all[me].n;if(document.activeElement!==nameEl)nameEl.value=myName;}}
+    return true;
+  }
+
+  let saving=0, chain=Promise.resolve();
+  function save(){
+    all[me]={n:myName,v:Object.assign({},mine)};render();
+    const row={voter:me,name:myName,choices:Object.assign({},mine),updated_at:new Date().toISOString()};
+    saving++;
+    chain=chain.then(async()=>{
+      const {error}=await sb.from("ti_votes").upsert(row,{onConflict:"voter"});
+      if(error)setHint("Tallennus epäonnistui: "+error.message,"err");
+    }).finally(()=>{saving--;});
+    return chain;
+  }
+  function vote(k,c){if(!myName)return;if(mine[k]===c)delete mine[k];else mine[k]=c;save();}
+
+  $("roll").addEventListener("submit",e=>{
+    e.preventDefault();
+    const v=nameEl.value.trim().replace(/\s+/g," ").slice(0,40);
+    if(!v){setHint("Kirjoita nimi ennen tallennusta.","err");nameEl.focus();return;}
+    if(!ready){setHint("Yhteys tietokantaan puuttuu vielä.","err");return;}
+    myName=v;nameEl.value=v;save().then(()=>{if(!hint.classList.contains("err"))setHint("Nimi tallennettu. Voit nyt äänestää.","ok");});
+  });
+
+  render();
+  (async()=>{
+    if(!window.supabase||String(window.SUPABASE_URL).indexOf("http")!==0){statusEl.textContent="Sivua ei ole vielä yhdistetty tietokantaan. Lisää Supabase-tiedot tiedoston alkuun.";return;}
+    sb=window.supabase.createClient(window.SUPABASE_URL,window.SUPABASE_KEY);
+    if(await load()){ready=true;render();}
+    // Päivitetään muiden äänet reaaliajassa, varalla 20 s välein
+    try{sb.channel("ti").on("postgres_changes",{event:"*",schema:"public",table:"ti_votes"},async()=>{if(await load())render();}).subscribe();}catch(e){}
+    setInterval(async()=>{if(document.visibilityState==="visible"&&await load()){ready=true;render();}},20000);
+  })();
+})();
+</script>
+</body>
+</html>
